@@ -1,4 +1,4 @@
-# Standard Young Tableaux
+4# Standard Young Tableaux
 In this assignment, you will learn to generate data for [Standard Young Tableaux](https://en.wikipedia.org/wiki/Young_tableau). Standard Young tableaux (SYT) show up very often in a field called algebraic combinatorics. It turns out that lots of information about permutations can be derived from SYTs of a specific shape.
 
 Your goal in this assignment will be to first generate all SYTs of a specified shape $(\lambda_1, \lambda_2, \ldots, \lambda_k)$. In general, this can be quite a slow process. Therefore, you will next implement a function that can generate a random SYT of a specified shape. You will implement two different algorithms for random generation and compare and contrast the two.

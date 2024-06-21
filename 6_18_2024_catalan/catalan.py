@@ -10,15 +10,31 @@ def parenthesizations(n):
   Returns:
     A set of strings, where each inner string represents a valid parenthesization of length n.
   
-  Example:
+   Example:
   >>> parenthesizations(3)
   {'((()))', '(()())', '(())()', '()(())', '()()()'}
   """
   if n == 0:
     return {""}
   else:
-    # TODO
-    pass
+    output = set()
+    parenthesizations_helper("", n, n, output)
+    return output
+
+"""
+res - result string
+open - number of open parenthesis
+close - number of close parenthesis
+output - output set
+"""
+def parenthesizations_helper(res, open, close, output):
+  if open == 0 and close == 0:
+    output.add(res)
+  else:
+    if open > 0:
+      parenthesizations_helper(res + "(", open - 1, close, output)
+    if close != open:
+      parenthesizations_helper(res + ")", open, close - 1, output) 
 
 def product_orders(n):
   """

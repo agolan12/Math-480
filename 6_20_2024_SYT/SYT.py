@@ -21,7 +21,18 @@ def is_valid_SYT(candidate):
   >>> is_valid_SYT(((1, 2, 3), (5, 4), (6))
   False
   """
-  return False
+  for T in candidate:
+    for i in range(len(T) - 1):
+      if T[i] >= T[i + 1]:
+        return False
+  for i in range(len(candidate) - 1):
+    top = candidate[i]
+    bottom = candidate[i + 1]
+    for j in range(len(bottom)):
+      if top[j] >= bottom[j]:
+        return False
+  return True
+    
 
 def reshape_perm(perm, shape):
   """
@@ -38,7 +49,15 @@ def reshape_perm(perm, shape):
   >>> reshape_perm((1, 2, 3, 4, 5, 6), (3, 2, 1))
   ((1, 2, 3), (4, 5), (6,))
   """
-  return tuple()
+  output = tuple()
+  index = 0
+  for lvl in shape:
+    row = []
+    for i in range(lvl):
+      row.append(perm[index])
+      index += 1
+    output += (tuple(row),)
+  return output
 
 def SYTs(shape):
   """
@@ -57,6 +76,9 @@ def SYTs(shape):
 
   n = sum(shape)
   results = []
+  for perm in itertools.permutations(range(1, n + 1)):
+    if is_valid_SYT(reshape_perm(perm, shape)):
+      results.append(reshape_perm(perm, shape))
   return results
 
 def random_SYT(shape):
@@ -75,7 +97,14 @@ def random_SYT(shape):
   >>> random_SYT((2, 1))
   ((1, 2), (3,))
   """
-  return tuple()
+  perm = []
+  for i in range(1,sum(shape) + 1):
+    perm.append(i)
+  random.shuffle(perm)
+  while not is_valid_SYT(reshape_perm(tuple(perm), shape)):
+    random.shuffle(perm)
+  return reshape_perm(tuple(perm), shape)
+  
 
 def random_SYT_2(shape):
   """
@@ -93,4 +122,38 @@ def random_SYT_2(shape):
   >>> random_SYT_2((2, 1))
   ((1, 2), (3,))
   """
-  return tuple()
+  size = sum(shape)
+  tableau = []
+  lvl = 0
+  for row_length in shape:
+    tableau.append([])
+    for i in range(row_length):
+      tableau[lvl].append(0)
+    lvl += 1
+  for i in range(1, size + 1):
+    square_options = valid_squares(tableau)
+    coordinates = random.choice(square_options)
+    tableau[coordinates[0]][coordinates[1]] = i
+  output = []
+  for row in tableau:
+    output += (tuple(row),)
+  return tuple(output)
+
+
+"""
+parameters:
+  - tableau : input tableau
+returns:
+  - list of tuples of valid squares in the tableau where the next element can be placed
+"""
+def valid_squares(tableau):
+  output = []
+  lvl = 0
+  for row in tableau:
+    for column in range(len(row)):
+      if tableau[lvl][column] == 0:
+        if lvl == 0 or tableau[lvl - 1][column] != 0:
+          if column == 0 or tableau[lvl][column - 1] != 0:
+            output.append([lvl, column])
+    lvl += 1
+  return output
