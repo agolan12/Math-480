@@ -12,8 +12,37 @@ def train_one_epoch(training_loader, model, loss_fn, optimizer):
     Returns:
         float: The total loss computed over the entire epoch.
     """
-    # TODO: Use https://pytorch.org/tutorials/beginner/introyt/trainingyt.html#the-training-loop as a reference.
-    pass
+    running_loss = 0.
+    last_loss = 0.
+
+    # Here, we use enumerate(training_loader) instead of
+    # iter(training_loader) so that we can track the batch
+    # index and do some intra-epoch reporting
+    for i, data in enumerate(training_loader):
+        # Every data instance is an input + label pair
+        inputs, labels = data
+
+        # Zero your gradients for every batch!
+        optimizer.zero_grad()
+
+        # Make predictions for this batch
+        outputs = model(inputs)
+
+        # Compute the loss and its gradients
+        loss = loss_fn(outputs, labels)
+        loss.backward()
+
+        # Adjust learning weights
+        optimizer.step()
+
+        # Gather data and report
+        running_loss += loss.item()
+        if i % 27 == 26:
+            last_loss = running_loss / 1000 # loss per batch
+            print('  batch {} loss: {}'.format(i + 1, last_loss))
+            running_loss = 0.
+
+    return last_loss
 
 def evaluate_model(model, test_dataset):
     """
@@ -30,5 +59,11 @@ def evaluate_model(model, test_dataset):
 
     with torch.no_grad():
         confusion_matrix = [[0, 0], [0, 0]]
-        # TODO
-        pass
+        for data in test_dataset:
+            inputs, labels = data
+            outputs = model(inputs)
+            prob = torch.nn.functional.softmax(outputs)
+            _, predicted = torch.max(prob, dim=0)
+            confusion_matrix[labels][predicted] += 1
+
+        return confusion_matrix
