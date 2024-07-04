@@ -13,8 +13,17 @@ def plot_linear_layer(
     Parameters:
         layer (nn.Linear): The Linear layer for which the weights are to be visualized.
     """
-    # TODO
-    return
+
+    weights = layer.weight
+    if len(weights.shape) > 2:
+        weights = weights.view(-1, weights.shape[-1])
+    maxVal = max(abs(weights.min()), abs(weights.max()))
+    plt.figure()
+    plt.imshow(weights.detach().numpy(), cmap="bwr", vmin=-maxVal, vmax=maxVal)
+    plt.colorbar()
+    plt.colorbar()
+    plt.title("Linear Layer")
+    plt.show()
 
 
 def incorrect_predictions(model, dataloader):
@@ -35,7 +44,13 @@ def incorrect_predictions(model, dataloader):
 
     with torch.no_grad():
         incorrect_predictions = [[], []]
-        # TODO
+        for data in dataloader:
+            input, label = data
+            output = model(input, mask=padding_mask(input))
+            predictions = torch.argmax(torch.select(output, 1, 0), dim=1)
+            for i, prediction in enumerate(predictions):
+                if prediction != label[i]:
+                    incorrect_predictions[label[i]].append(input[i].tolist())
         return incorrect_predictions
 
 
@@ -53,10 +68,19 @@ def token_contributions(model, single_input):
     Returns:
         List[float]: A list of contributions of each token to the model's output.
     """
+    # inputs = torch.tensor(single_input)
     output = model(single_input, mask=padding_mask(single_input))
-
+    output_probs = torch.argmax(torch.select(output, 0, 0))
     result = []
-    # TODO
+    for i in range(len(single_input)):
+        new_input = single_input.clone()
+        if new_input[i] == 0:
+            new_input[i] = 1
+        elif new_input[i] == 1:
+            new_input[i] = 0
+        new_output = model(new_input, mask=padding_mask(new_input))
+        new_probs = torch.argmax(torch.select(new_output, 0, 0))
+        result.append(output_probs - new_probs)
     return result
 
 def activations(model, dataloader):
