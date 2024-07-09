@@ -95,6 +95,18 @@ def activations(model, dataloader):
     Returns:
         List[int]: A list of frequencies for each hidden feature in the feedforward layer of the model.
     """
-    result = []
-    # TODO
+    result = [0 for i in range(32)]
+
+    for data in dataloader:
+        input, _ = data
+        activations = model(input).encoder.layers[1].activations
+        if len(activations) == 0:
+            continue
+        activations = activations[-1]
+        print(activations)
+        for i in range(len(activations)):
+            if activations[i] is True:
+                result[i] += 1
+            else:
+                result[i] += 0
     return result
