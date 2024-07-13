@@ -23,19 +23,19 @@ theorem assignment1 : ∀ n:ℕ, 2^n % 7 = 1 ∨ 2^n % 7 = 2 ∨ 2^n % 7 = 4 := 
     | inl h_left =>
       right
       left
-      rw [pow_succ]
-
-    |inl h_right =>
-      right
-      left
-      rw [pow_succ]
-
-    cases h_right with
-    | inl h_right =>
-    | inl h_left =>
-
-
-
+      rw [pow_succ, Nat.mul_mod]
+      simp [h_left]
+    |inr h_right =>
+      cases h_right with
+      | inl h_right =>
+        right
+        right
+        rw [pow_succ, Nat.mul_mod]
+        simp [h_right]
+      | inr h_left =>
+        left
+        rw [pow_succ, Nat.mul_mod]
+        simp [h_left]
 
 -- Assignment 2: Show that (1-x)*(1+x+x^2+...+x^{n-1}) = (1-x^n)
 theorem assignment2
